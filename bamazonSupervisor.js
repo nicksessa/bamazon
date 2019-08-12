@@ -66,6 +66,26 @@ from
 inner join departments b on a.department_name = b.department_name;
 group by a.department_name
 
+
+maybe this:
+
+var SQL = require('sql-template-strings')
+ 
+var id = 1234
+ 
+var query = (SQL
+            `SELECT fname, lname, email
+             FROM users
+             WHERE id = ${id}`
+            )
+
+
+or use:
+
+var SQL = `SELECT * \
+FROM table`
+
+
 */
 
 function createNewDepartment() {
