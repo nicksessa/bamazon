@@ -42,9 +42,60 @@ function mainMenu() {
 }
 
 function viewProductSales() {
+  var SQL = "SELECT "
+
+  connection.query(SQL, function(err, res) {
+    if (err) throw err;
+    console.log("Row added")
+    connection.end();
+  });
 
 }
 
-function createNewDepartment() {
+/*
+-- make the whole thing a string using backticks?
 
+select 
+  a.department_id, 
+  a.department_name, 
+  b.over_head_costs, 
+  a.product_sales,
+  sum(a.product_sales - b.over_head_costs) as total_profit
+from
+  products a
+inner join departments b on a.department_name = b.department_name;
+group by a.department_name
+
+*/
+
+function createNewDepartment() {
+  inquirer.prompt([
+    {
+      name: "departmentName",
+      type: "input",
+      message: "Department Name: "
+      
+    },
+    {
+      name: "overHeadCosts",
+      type: "input",
+      message: "Over Head Costs: ",
+      validate: function( value ) {
+        var valid = !isNaN(parseFloat(value));
+        return valid || "Please enter a number";
+      },
+      filter: Number
+    }
+  ])
+  .then(function(answer) {
+    var SQL = "INSERT INTO departments(department_name, over_head_costs) VALUES ?";
+    var values = [
+      answer.departmentName,
+      answer.over_head_costs
+    ];
+    connection.query(SQL, [values], function(err, res) {
+      if (err) throw err;
+      console.log("Row added")
+      connection.end();
+  });
 }
