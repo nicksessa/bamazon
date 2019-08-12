@@ -144,6 +144,6 @@ function addNewProduct() {
     connection.query(SQL, [values], function(err, res) {
       if (err) throw err;
       console.log("Row added")
-
+      connection.end();
   });
 }
