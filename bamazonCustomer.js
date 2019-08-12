@@ -57,7 +57,7 @@ function buyStuff() {
   ])
   .then(function(answer) {
     // Check inventory
-    var SQL = "SELECT item_id, product_name, stock_quantity FROM products WHERE item_id = " + answer.itemID;
+    var SQL = "SELECT item_id, product_name, stock_quantity FROM products WHERE item_id = " + mysql.escape(answer.itemID);
     connection.query(SQL, function(err, res) {
       if (err) throw err;
       var totalAvailable = res.stock_quantity;
@@ -69,7 +69,7 @@ function buyStuff() {
          var newTotal = res.stock_quantity - answer.quantity;
 
          //  then update the db
-         var updateSQL = "UPDATE products SET stock_quantity=" + newTotal + " WHERE item_id=" + answer.itemID;
+         var updateSQL = "UPDATE products SET stock_quantity=" + mysql.escape(newTotal) + " WHERE item_id=" + mysql.escape(answer.itemID);
          connection.query(updateSQL, function(err, res2) {
            if (err) throw err;
            console.log("Item purchased!")
@@ -79,6 +79,7 @@ function buyStuff() {
          var totalPrice = answer.quantity * res.price;
          console.log("Total Price: $" + totalPrice)
       }
+      connection.end();
     })
   });
 }
