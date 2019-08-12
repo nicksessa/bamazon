@@ -89,7 +89,7 @@ function addInventory() {
 
     //var newQty = answer.addQty + res.stock_quantity;
 
-    var updateSQL = "UPDATE products SET stock_quantity=stock_quantity" + answer.addQty + " WHERE item_id=" + answer.itemID;
+    var updateSQL = "UPDATE products SET stock_quantity=stock_quantity" + mysql.escape(answer.addQty) + " WHERE item_id=" + mySql.escape(answer.itemID);
     connection.query(SQL, function(err, res) {
       console.log(res);
       console.table(res);
