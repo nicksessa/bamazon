@@ -115,7 +115,7 @@ function addNewProduct() {
     {
       name: "price",
       type: "input",
-      message: "Price: "
+      message: "Price: ",
       validate: function( value ) {
         var valid = !isNaN(parseFloat(value));
         return valid || "Please enter a number";
@@ -125,7 +125,7 @@ function addNewProduct() {
     {
       name: "qty",
       type: "input",
-      message: "Quantity: "
+      message: "Quantity: ",
       validate: function( value ) {
         var valid = !isNaN(parseFloat(value));
         return valid || "Please enter a number";
