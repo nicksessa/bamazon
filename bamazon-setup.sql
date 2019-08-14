@@ -32,4 +32,43 @@ values ("The Brothers Karamazov", "books", 26.59, 400),
 ("P51 Mustang - Revelle", "toys & games", 19.50, 50),
 ("P38 Lightning - Revelle", "toys & games", 22.50, 45),
 ("F4U Corsair - Revelle", "toys & games", 20.95, 30),
-("P40 Warhawk - Testors", "toys & games", 14.25, 25)
+("P40 Warhawk - Testors", "toys & games", 14.25, 25);
+
+
+select * from products;
+
+
+select 
+  b.department_id, 
+  a.department_name, 
+  b.over_head_costs, 
+  sum(a.product_sales) as product_sales,
+  sum(a.product_sales - b.over_head_costs) as total_profit
+from
+  products a
+inner join departments b on a.department_name = b.department_name
+group by a.department_name;
+
+
+ALTER TABLE products
+ADD product_sales decimal(10,4);
+
+create table departments(
+department_id int not null auto_increment primary key,
+department_name varchar(40) not null,
+over_head_costs decimal(10,4)
+);
+
+insert into departments(department_name, over_head_costs)
+values("books", 1000),
+("toys & games", 20000);
+
+
+select * from departments;
+
+update products set product_sales = 1000 where product_name = "The Divine Comedy";
+-- update products set product_sales = 1000 where product_sales = null;
+select * from products;
+
+select * from products where product_name != "The Divine Comedy";
+update products set product_sales = 1000 where product_name != "The Divine Comedy";
