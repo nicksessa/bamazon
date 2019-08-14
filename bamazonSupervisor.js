@@ -55,6 +55,22 @@ function viewProductSales() {
 /*
 -- make the whole thing a string using backticks?
 
+-- **************************************************************************
+select 
+  b.department_id, 
+  b.department_name, 
+  b.over_head_costs, 
+  total_sales,
+  sum(total_sales - b.over_head_costs) as total_profit
+from departments b
+  left join (select a.department_name, sum(a.product_sales) as total_sales 
+  from products a 
+  group by a.department_name) as x on x.department_name = b.department_name
+group by b.department_id, total_sales;
+
+-- **************************************************************************
+
+the following does not work.  use the sql above.
 select 
   a.department_id, 
   a.department_name, 
