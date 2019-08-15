@@ -11,11 +11,11 @@ var connection = mysql.createConnection({
   user: "root",
 
   // Your password
-  password: "zaq1@WSXcde3",
+  password: "password",
   database: "bamazon"
 });
 
-connection.connect(function(err) {
+connection.connect(function (err) {
   if (err) throw err;
   mainMenu();
 });
@@ -27,29 +27,40 @@ function mainMenu() {
       name: "choice",
       type: "list",
       message: "Select an option:",
-      choices: ["View Products Sales by Department", "Create New Department"]
+      choices: ["View Products Sales by Department", "Create New Department", "Quit"]
     })
-    .then (function(answer) {
+    .then(function (answer) {
       if (answer.choice === "View Products Sales by Department") {
         viewProductSales();
       } else if (answer.choice === "Create New Department") {
         createNewDepartment();
-      } else {
+      } else if (answer.choice === "Quit") {
+        connection.end();
         return;
       }
-    }
-  });
+    })
 }
 
 function viewProductSales() {
-  var SQL = "SELECT "
+  var SQL = `select 
+  b.department_id, 
+  b.department_name, 
+  b.over_head_costs, 
+  total_sales,
+  sum(total_sales - b.over_head_costs) as total_profit
+from departments b
+  left join (select a.department_name, sum(a.product_sales) as total_sales 
+  from products a 
+  group by a.department_name) as x on x.department_name = b.department_name
+group by b.department_id, total_sales;
+`
 
-  connection.query(SQL, function(err, res) {
+  connection.query(SQL, function (err, res) {
     if (err) throw err;
-    console.log("Row added")
-    connection.end();
+    console.table(res)
+    //connection.end();
+    mainMenu()
   });
-
 }
 
 /*
@@ -69,19 +80,6 @@ from departments b
 group by b.department_id, total_sales;
 
 -- **************************************************************************
-
-the following does not work.  use the sql above.
-select 
-  a.department_id, 
-  a.department_name, 
-  b.over_head_costs, 
-  a.product_sales,
-  sum(a.product_sales - b.over_head_costs) as total_profit
-from
-  products a
-inner join departments b on a.department_name = b.department_name;
-group by a.department_name
-
 
 maybe this:
 
@@ -110,28 +108,36 @@ function createNewDepartment() {
       name: "departmentName",
       type: "input",
       message: "Department Name: "
-      
+
     },
     {
       name: "overHeadCosts",
       type: "input",
       message: "Over Head Costs: ",
-      validate: function( value ) {
+      validate: function (value) {
         var valid = !isNaN(parseFloat(value));
         return valid || "Please enter a number";
       },
       filter: Number
     }
   ])
-  .then(function(answer) {
-    var SQL = "INSERT INTO departments(department_name, over_head_costs) VALUES ?";
-    var values = [
-      answer.departmentName,
-      answer.over_head_costs
-    ];
-    connection.query(SQL, [values], function(err, res) {
-      if (err) throw err;
-      console.log("Row added")
-      connection.end();
-  });
+    .then(function (answer) {
+      var SQL = connection.query(
+        'INSERT INTO departments SET ?',
+        {
+          department_name: answer.departmentName,
+          over_head_costs: answer.over_head_costs
+        },
+        function (err, res) {
+        if (err) throw err;
+        console.log("Row added")
+        var SQL = 'SELECT * FROM products WHERE department_name=' + mysql.escape(answer.departmentName)
+        connection.query(SQL, function (err2, res2) {
+          if (err2) throw err2;
+          console.table(res2)
+          mainMenu()
+        })
+        //connection.end();
+      });
+    })
 }

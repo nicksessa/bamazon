@@ -72,3 +72,20 @@ select * from products;
 
 select * from products where product_name != "The Divine Comedy";
 update products set product_sales = 1000 where product_name != "The Divine Comedy";
+
+
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password'
+
+
+select 
+  b.department_id, 
+  b.department_name, 
+  b.over_head_costs, 
+  total_sales,
+  sum(total_sales - b.over_head_costs) as total_profit
+from departments b
+  left join (select a.department_name, sum(a.product_sales) as total_sales 
+  from products a 
+  group by a.department_name) as x on x.department_name = b.department_name
+group by b.department_id, total_sales;
+
