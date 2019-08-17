@@ -6,17 +6,15 @@
 
 This project is an Amazon-like storefront which utilizes a MySQL database. The app takes in orders from customers and depletes stock from the store's inventory. As a bonus the app also tracks product sales across your store's departments and then provide a summary of the highest-grossing departments in the store.
 
+## Customer View 
 
+### The Database Setup
 
-## Instructions
+1. Using a MySQL Database called `bamazon`.
 
-### Challenge #1: Customer View (Minimum Requirement)
+2. We create a Table inside of that database called `products`.
 
-1. Create a MySQL Database called `bamazon`.
-
-2. Then create a Table inside of that database called `products`.
-
-3. The products table should have each of the following columns:
+3. The products table has each of the following columns:
 
    * item_id (unique id for each product)
 
@@ -28,32 +26,68 @@ This project is an Amazon-like storefront which utilizes a MySQL database. The a
 
    * stock_quantity (how much of the product is available in stores)
 
-4. Populate this database with around 10 different products. (i.e. Insert "mock" data rows into this database and table).
+## The Customer Application
 
-5. Then create a Node application called `bamazonCustomer.js`. Running this application will first display all of the items available for sale. Include the ids, names, and prices of products for sale.
+4. Then create a Node application called `bamazonCustomer.js`. Running this application will first display all of the items available for sale. Include the ids, names, and prices of products for sale.
 
-6. The app should then prompt users with two messages.
+5. The app then prompts users with two messages.
 
-   * The first should ask them the ID of the product they would like to buy.
-   * The second message should ask how many units of the product they would like to buy.
+   * The first asks for the ID of the product they would like to buy.
+   * The second message ask how many units of the product they would like to buy.
 
-7. Once the customer has placed the order, your application should check if your store has enough of the product to meet the customer's request.
+![Image of the bamazon customer prompt](./images/bamazon_customer1.png)
 
-   * If not, the app should log a phrase like `Insufficient quantity!`, and then prevent the order from going through.
+6. Once the customer has placed the order, the application checks if the store has enough of the product to meet the customer's request.
 
-8. However, if your store _does_ have enough of the product, you should fulfill the customer's order.
-   * This means updating the SQL database to reflect the remaining quantity.
-   * Once the update goes through, show the customer the total cost of their purchase.
+```js
+ // Check inventory
+      var SQL = 'SELECT item_id, product_name, stock_quantity, price FROM products WHERE item_id = ' + mysql.escape(answer.itemID);
+      //console.log("[SQL] " + SQL)
+      connection.query(SQL, function (err, res) {
+        if (err) throw err;
+        var totalAvailable = parseInt(res[0].stock_quantity);
+        if (totalAvailable < parseInt(answer.quantity)) {
+          console.log("Insufficient quantity!");
+          connection.end();
+          return;
+        } else {
+          // subtract the quantity ordered from the totalAvailable
+          var newTotal = parseInt(res[0].stock_quantity) - parseInt(answer.quantity);
+          // show the total price: quantity * price
+          var totalPrice = answer.quantity * parseFloat(res[0].price);
+          //  then update the db
+          var updateSQL = 'UPDATE products SET stock_quantity=' + mysql.escape(newTotal) + ' WHERE item_id=' + mysql.escape(answer.itemID);
+          connection.query(updateSQL, function (err, res2) {
+            if (err) throw err;
+            if (answer.quantity > 1) {
+              console.log("Items purchased!")
+            } else {
+              console.log("Item purchased!")
+            }
+            console.log("Total Price: $" + totalPrice)
+          });
+        }
+        connection.end();
+      })
+    });
+```
+
+   * If not, the app logs: `Insufficient quantity!` to the screen, and then prevents the order from going through.
+
+![Image of the bamazon customer prompt](./images/bamazon_customer3.png)
+
+8. However, if the store _does_ have enough of the product, the application will fulfill the customer's order.
+
+![Image of the bamazon customer prompt](./images/bamazon_customer2.png)
 
 - - -
 
-* If this activity took you between 8-10 hours, then you've put enough time into this assignment. Feel free to stop here -- unless you want to take on the next challenge.
 
 - - -
 
-### Challenge #2: Manager View (Next Level)
+### Manager View
 
-* Create a new Node application called `bamazonManager.js`. Running this application will:
+* Using the same database `bamazon` the next Node application `bamazonManager.js` does the following:
 
   * List a set of menu options:
 
@@ -65,33 +99,49 @@ This project is an Amazon-like storefront which utilizes a MySQL database. The a
     
     * Add New Product
 
+![Image of the bamazon manager menu](./images/bamazon_manager1.png)
+
   * If a manager selects `View Products for Sale`, the app should list every available item: the item IDs, names, prices, and quantities.
+
+![Image of the bamazon manager menu](./images/bamazon_manager2.png)
 
   * If a manager selects `View Low Inventory`, then it should list all items with an inventory count lower than five.
 
+![Image of the bamazon manager menu](./images/bamazon_manager3.png)
+
   * If a manager selects `Add to Inventory`, your app should display a prompt that will let the manager "add more" of any item currently in the store.
+
+![Image of the bamazon manager menu](./images/bamazon_manager4.png)
 
   * If a manager selects `Add New Product`, it should allow the manager to add a completely new product to the store.
 
-- - -
-
-* If you finished Challenge #2 and put in all the hours you were willing to spend on this activity, then rest easy! Otherwise continue to the next and final challenge.
+![Image of the bamazon manager menu](./images/bamazon_manager5.png)
 
 - - -
 
-### Challenge #3: Supervisor View (Final Level)
+### Supervisor View
 
-1. Create a new MySQL table called `departments`. Your table should include the following columns:
+1. For this application, we need to create a new MySQL table called `departments`. The table includes the following columns:
 
    * department_id
 
    * department_name
 
-   * over_head_costs (A dummy number you set for each department)
+   * over_head_costs
 
 2. Modify the products table so that there's a product_sales column, and modify your `bamazonCustomer.js` app so that when a customer purchases anything from the store, the price of the product multiplied by the quantity purchased is added to the product's product_sales column.
 
-   * Make sure your app still updates the inventory listed in the `products` column.
+```js
+  // get product_sales
+  var productSales = parseFloat(res[0].product_sales);
+  var newProductSales = totalPrice + productSales;
+  // now update product_sales
+  var updateSQL = 'UPDATE products SET product_sales=' + mysql.escape(newProductSales) + ' WHERE item_id=' + mysql.escape(answer.itemID);
+  connection.query(updateSQL, function (err, res2) {
+    if (err) throw err;
+    console.log("Total Product Sales: $" + newProductSales)
+  });
+```
 
 3. Create another Node app called `bamazonSupervisor.js`. Running this application will list a set of menu options:
 
@@ -99,55 +149,36 @@ This project is an Amazon-like storefront which utilizes a MySQL database. The a
    
    * Create New Department
 
-4. When a supervisor selects `View Product Sales by Department`, the app should display a summarized table in their terminal/bash window. Use the table below as a guide.
+![Image of the bamazon supervisor menu](./images/bamazon_supervisor1.png)
 
-| department_id | department_name | over_head_costs | product_sales | total_profit |
-| ------------- | --------------- | --------------- | ------------- | ------------ |
-| 01            | Electronics     | 10000           | 20000         | 10000        |
-| 02            | Clothing        | 60000           | 100000        | 40000        |
 
-5. The `total_profit` column should be calculated on the fly using the difference between `over_head_costs` and `product_sales`. `total_profit` should not be stored in any database. You should use a custom alias.
+4. When a supervisor selects `View Product Sales by Department`, the app displays a summarized table in their terminal/bash window. For example:
 
-6. If you can't get the table to display properly after a few hours, then feel free to go back and just add `total_profit` to the `departments` table.
+![Image of the bamazon supervisor menu](./images/bamazon_supervisor2.png)
 
-   * Hint: You may need to look into aliases in MySQL.
+5. The `total_profit` column is calculated on the fly using the difference between `over_head_costs` and `product_sales`. `total_profit` is not be stored in any database. I used a custom alias and subselect to affect this outcome.
 
-   * Hint: You may need to look into GROUP BYs.
+* Using backticks, I was able to use this SQL to get the correct results:
 
-   * Hint: You may need to look into JOINS.
+```js
+var SQL = `select 
+  b.department_id, 
+  b.department_name, 
+  b.over_head_costs, 
+  total_sales,
+  sum(total_sales - b.over_head_costs) as total_profit
+from departments b
+  left join (select a.department_name, sum(a.product_sales) as total_sales 
+  from products a 
+  group by a.department_name) as x on x.department_name = b.department_name
+group by b.department_id, total_sales;
+`
+```
 
-   * **HINT**: There may be an NPM package that can log the table to the console. What's is it? Good question :)
+6. The user can select `Create New Department` to create a new department.
 
-### Reminder: Submission on BCS
+![Image of the bamazon supervisor menu](./images/bamazon_supervisor3.png)
 
-* Please submit the link to the Github Repository!
+* Additionaly, here is a link to the Github Repository.
 
-- - -
 
-### Minimum Requirements
-
-Attempt to complete homework assignment as described in instructions. If unable to complete certain portions, please pseudocode these portions to describe what remains to be completed. Adding a README.md as well as adding this homework to your portfolio are required as well and more information can be found below.
-
-- - -
-
-### Create a README.md
-
-Add a `README.md` to your repository describing the project. Here are some resources for creating your `README.md`. Here are some resources to help you along the way:
-
-* [About READMEs](https://help.github.com/articles/about-readmes/)
-
-* [Mastering Markdown](https://guides.github.com/features/mastering-markdown/)
-
-- - -
-
-### Add To Your Portfolio
-
-After completing the homework please add the piece to your portfolio. Make sure to add a link to your updated portfolio in the comments section of your homework so the TAs can easily ensure you completed this step when they are grading the assignment. To receive an 'A' on any assignment, you must link to it from your portfolio.
-
-- - -
-
-### One More Thing
-
-If you have any questions about this project or the material we have covered, please post them in the community channels in slack so that your fellow developers can help you! If you're still having trouble, you can come to office hours for assistance from your instructor and TAs.
-
-**Good Luck!**

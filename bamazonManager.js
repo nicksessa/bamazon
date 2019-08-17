@@ -48,8 +48,9 @@ function viewProducts() {
   var SQL = "SELECT * FROM products";
   connection.query(SQL, function (err, res) {
     if (err) throw err;
-    //console.log(res);
     console.table(res);
+    // The connection has to stay open if we call the menu again.
+    // Otherwise, we can end it here if we don't call the menu and simply exit.
     //connection.end();
     mainMenu()
   })
@@ -59,14 +60,13 @@ function viewLowInventory() {
   var SQL = 'SELECT * FROM products WHERE stock_quantity < 50';
   connection.query(SQL, function (err, res) {
     if (err) throw err;
-    //console.log(res);
-    //console.log("result length: " + res.length)
     if (res.length == 0) {
       console.log("\nNo items need to be restocked.\n")
     } else {
       console.table(res);
     }
-
+    // The connection has to stay open if we call the menu again.
+    // Otherwise, we can end it here if we don't call the menu and simply exit.
     //connection.end();
     mainMenu()
   })
@@ -112,14 +112,11 @@ function addInventory() {
         } else {
           console.table(res)
           var newQty = parseInt(answer.addQty) + parseInt(res[0].stock_quantity);
-          //console.log("old quantity: " + res[0].stock_quantity)
-          //console.log("new quantity: " + newQty)
           var updateSQL = 'UPDATE products SET stock_quantity=' + mysql.escape(newQty) + ' WHERE item_id=' + mysql.escape(answer.itemID);
-          //console.log("SQL: " + updateSQL)
           connection.query(updateSQL, function (err, res) {
             if (err) throw err;
-            //console.log(res);
-            //console.table(res);
+            // The connection has to stay open if we call the menu again.
+            // Otherwise, we can end it here if we don't call the menu and simply exit.
             //connection.end();
             connection.query(SQL, function (err2, res2) {
               if (err2) throw err2;
@@ -139,7 +136,6 @@ function addNewProduct() {
       name: "productName",
       type: "input",
       message: "Product Name: ",
-
     },
     {
       name: "departmentName",
@@ -168,7 +164,6 @@ function addNewProduct() {
     }
   ])
     .then(function (answer) {
-
       var SQL = connection.query(
         'INSERT INTO products SET ?',
         {
@@ -180,6 +175,8 @@ function addNewProduct() {
         function (err, res) {
           if (err) throw err;
           console.log("Row added")
+          // The connection has to stay open if we call the menu again.
+          // Otherwise, we can end it here if we don't call the menu and simply exit.
           //connection.end();
           var SQL = 'SELECT * FROM products WHERE product_name=' + mysql.escape(answer.productName)
           connection.query(SQL, function (err2, res2) {

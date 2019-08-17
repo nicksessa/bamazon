@@ -58,49 +58,12 @@ group by b.department_id, total_sales;
   connection.query(SQL, function (err, res) {
     if (err) throw err;
     console.table(res)
+    // The connection has to stay open if we call the menu again.
+    // Otherwise, we can end it here if we don't call the menu and simply exit.
     //connection.end();
     mainMenu()
   });
 }
-
-/*
--- make the whole thing a string using backticks?
-
--- **************************************************************************
-select 
-  b.department_id, 
-  b.department_name, 
-  b.over_head_costs, 
-  total_sales,
-  sum(total_sales - b.over_head_costs) as total_profit
-from departments b
-  left join (select a.department_name, sum(a.product_sales) as total_sales 
-  from products a 
-  group by a.department_name) as x on x.department_name = b.department_name
-group by b.department_id, total_sales;
-
--- **************************************************************************
-
-maybe this:
-
-var SQL = require('sql-template-strings')
- 
-var id = 1234
- 
-var query = (SQL
-            `SELECT fname, lname, email
-             FROM users
-             WHERE id = ${id}`
-            )
-
-
-or use:
-
-var SQL = `SELECT * \
-FROM table`
-
-
-*/
 
 function createNewDepartment() {
   inquirer.prompt([
@@ -129,15 +92,17 @@ function createNewDepartment() {
           over_head_costs: answer.over_head_costs
         },
         function (err, res) {
-        if (err) throw err;
-        console.log("Row added")
-        var SQL = 'SELECT * FROM products WHERE department_name=' + mysql.escape(answer.departmentName)
-        connection.query(SQL, function (err2, res2) {
-          if (err2) throw err2;
-          console.table(res2)
-          mainMenu()
-        })
-        //connection.end();
-      });
+          if (err) throw err;
+          console.log("Row added")
+          var SQL = 'SELECT * FROM products' + mysql.escape(answer.departmentName)
+          connection.query(SQL, function (err2, res2) {
+            if (err2) throw err2;
+            console.table(res2)
+            mainMenu()
+          })
+          // The connection has to stay open if we call the menu again.
+          // Otherwise, we can end it here if we don't call the menu and simply exit.
+          //connection.end();
+        });
     })
 }
