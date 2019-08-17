@@ -85,16 +85,17 @@ function createNewDepartment() {
     }
   ])
     .then(function (answer) {
-      var SQL = connection.query(
+      console.log("overheadcosts: " + answer.overHeadCosts)
+      connection.query(
         'INSERT INTO departments SET ?',
         {
           department_name: answer.departmentName,
-          over_head_costs: answer.over_head_costs
+          over_head_costs: answer.overHeadCosts
         },
         function (err, res) {
           if (err) throw err;
-          console.log("Row added")
-          var SQL = 'SELECT * FROM products' + mysql.escape(answer.departmentName)
+          console.table(res)
+          var SQL = 'SELECT * FROM departments'
           connection.query(SQL, function (err2, res2) {
             if (err2) throw err2;
             console.table(res2)
