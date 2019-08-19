@@ -12,32 +12,31 @@ This project is an Amazon-like storefront which utilizes a MySQL database. The a
 
 1. Using a MySQL Database called `bamazon`.
 
-2. We create a Table inside of that database called `products`.
+2. There is a Table inside of the `bamazon` database called `products`.
 
-3. The products table has each of the following columns:
+3. The products table has the following columns:
 
    * item_id (unique id for each product)
 
-   * product_name (Name of product)
+   * product_name 
 
    * department_name
 
    * price (cost to customer)
 
-   * stock_quantity (how much of the product is available in stores)
+   * stock_quantity 
+   
+   * product_sales 
 
 ## The Customer Application
 
-4. Then create a Node application called `bamazonCustomer.js`. Running this application will first display all of the items available for sale. Include the ids, names, and prices of products for sale.
+4. The Customer Application is called `bamazonCustomer.js` and is executed by running `node bamazonCustomer.js` from the command line. Running this application will first display all of the items available for sale. Include the ids, names, and prices of products for sale.
 
-5. The app then prompts users with two messages.
-
-   * The first asks for the ID of the product they would like to buy.
-   * The second message ask how many units of the product they would like to buy.
+5. The app then prompts the user to enter the ID of the product they wish to purchase and then they are prompted to enter the number of items they want to buy.
 
 ![Image of the bamazon customer prompt](./images/bamazon_customer1.png)
 
-6. Once the customer has placed the order, the application checks if the store has enough of the product to meet the customer's request.
+6. Once the customer has placed the order, the application checks the store database to see if it has enough of the product to meet the customer's request.
 
 ```js
  // Check inventory
@@ -82,9 +81,6 @@ This project is an Amazon-like storefront which utilizes a MySQL database. The a
 
 - - -
 
-
-- - -
-
 ### Manager View
 
 * Using the same database `bamazon` the next Node application `bamazonManager.js` does the following:
@@ -121,7 +117,7 @@ This project is an Amazon-like storefront which utilizes a MySQL database. The a
 
 ### Supervisor View
 
-1. For this application, we need to create a new MySQL table called `departments`. The table includes the following columns:
+1. For this application, a new MySQL table called `departments` was created. The table includes the following columns:
 
    * department_id
 
@@ -129,7 +125,7 @@ This project is an Amazon-like storefront which utilizes a MySQL database. The a
 
    * over_head_costs
 
-2. Modify the products table so that there's a product_sales column, and modify your `bamazonCustomer.js` app so that when a customer purchases anything from the store, the price of the product multiplied by the quantity purchased is added to the product's product_sales column.
+2. Note that the `products` table had to be modified to include a product_sales column. The `bamazonCustomer.js` app also had to be modified so that when a customer purchases anything from the store, the price of the product multiplied by the quantity purchased is added to the product's product_sales column.
 
 ```js
   // get product_sales
@@ -143,7 +139,7 @@ This project is an Amazon-like storefront which utilizes a MySQL database. The a
   });
 ```
 
-3. Create another Node app called `bamazonSupervisor.js`. Running this application will list a set of menu options:
+3. The supervisor app is called `bamazonSupervisor.js`. Running this application will list a set of menu options:
 
    * View Product Sales by Department
    
