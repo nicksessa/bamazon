@@ -105,11 +105,11 @@ This project is an Amazon-like storefront which utilizes a MySQL database. The a
 
 ![Image of the bamazon manager menu](./images/bamazon_manager3.png)
 
-  * If a manager selects `Add to Inventory`, your app should display a prompt that will let the manager "add more" of any item currently in the store.
+  * If a manager selects `Add to Inventory`, the app displays a prompt that will let the manager "add more" of any item currently in the store.
 
 ![Image of the bamazon manager menu](./images/bamazon_manager4.png)
 
-  * If a manager selects `Add New Product`, it should allow the manager to add a completely new product to the store.
+  * If a manager selects `Add New Product`, it allows the manager to add a completely new product to the store.
 
 ![Image of the bamazon manager menu](./images/bamazon_manager5.png)
 
